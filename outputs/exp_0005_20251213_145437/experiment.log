@@ -1,0 +1,14 @@
+[2025-12-13 14:54:37] experiment_id=exp_0005_20251213_145437
+[2025-12-13 14:54:37] command=driftrpl_paper_final.py --device cuda --seeds 0 --hs 1 --total_len 6000 --segment_len 1000 --save_runs --live_loss --log_every 200
+[2025-12-13 14:54:37] device=cuda model=gru seeds=[0] hs=[1]
+[2025-12-13 14:54:44] done method=Static seed=0 h=1 MAE=1.551332 RMSE=2.212139 sMAPE=1.826242 Rec=1.651555
+[2025-12-13 14:55:13] done method=OnlineSGD seed=0 h=1 MAE=0.633213 RMSE=0.828390 sMAPE=0.804361 Rec=0.779912
+[2025-12-13 14:55:46] done method=SlidingWindowSGD seed=0 h=1 MAE=0.588406 RMSE=0.813425 sMAPE=0.773443 Rec=0.783497
+[2025-12-13 14:56:15] done method=PHResetSGD seed=0 h=1 MAE=0.635648 RMSE=0.838651 sMAPE=0.809577 Rec=0.805594
+[2025-12-13 14:56:45] done method=UniformReplay seed=0 h=1 MAE=0.589004 RMSE=0.817584 sMAPE=0.772953 Rec=0.781948
+[2025-12-13 14:57:16] done method=ReservoirReplay seed=0 h=1 MAE=0.748385 RMSE=0.995128 sMAPE=0.874819 Rec=0.901975
+[2025-12-13 14:57:48] done method=DriftRPL seed=0 h=1 MAE=0.751891 RMSE=0.966438 sMAPE=0.949142 Rec=0.890445
+[2025-12-13 14:57:50] plots_saved prefix=rep_seed0_h1_gru_exp_0005_20251213_145437
+[2025-12-13 14:57:50] saved outputs_ai_paper\exp_0005_20251213_145437\results_per_run_exp_0005_20251213_145437.csv
+[2025-12-13 14:57:50] saved outputs_ai_paper\exp_0005_20251213_145437\results_agg_mean_std_exp_0005_20251213_145437.csv
+[2025-12-13 14:57:50] saved outputs_ai_paper\exp_0005_20251213_145437\leaderboard_exp_0005_20251213_145437.csv

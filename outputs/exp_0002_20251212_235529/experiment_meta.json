@@ -1,0 +1,19 @@
+{
+  "experiment_id": "exp_0002_20251212_235529",
+  "timestamp": "20251212_235529",
+  "command": "driftrpl_paper_final.py --device cuda --seeds 0 1 2 3 4 --hs 1 5 10 --save_runs --save_checkpoints --live_loss --log_every 500",
+  "device": "cuda",
+  "model": "gru",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "hs": [
+    1,
+    5,
+    10
+  ]
+}

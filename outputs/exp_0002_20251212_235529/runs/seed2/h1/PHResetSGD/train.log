@@ -1,0 +1,35 @@
+[2025-12-13 00:09:59] run_start method=PHResetSGD mode=ph_reset_sgd seed=2 h=1 device=cuda
+[2025-12-13 00:09:59] cfg L=64 M=128 B=32 K=1 lr=0.0003 warmup=200
+[2025-12-13 00:09:59] progress step=0/11936 loss=7.801693 ema=7.801693
+[2025-12-13 00:10:00] drift_detected step=204 optimizer_reset=1
+[2025-12-13 00:10:01] progress step=500/11936 loss=0.063696 ema=0.819183
+[2025-12-13 00:10:04] progress step=1000/11936 loss=0.243307 ema=0.505039
+[2025-12-13 00:10:07] progress step=1500/11936 loss=0.033496 ema=0.538323
+[2025-12-13 00:10:09] progress step=2000/11936 loss=0.053587 ema=0.523430
+[2025-12-13 00:10:11] progress step=2500/11936 loss=0.177040 ema=0.356265
+[2025-12-13 00:10:14] progress step=3000/11936 loss=0.687421 ema=0.321471
+[2025-12-13 00:10:16] progress step=3500/11936 loss=0.526293 ema=0.284633
+[2025-12-13 00:10:18] progress step=4000/11936 loss=0.001228 ema=0.344670
+[2025-12-13 00:10:21] progress step=4500/11936 loss=0.057777 ema=0.371827
+[2025-12-13 00:10:23] progress step=5000/11936 loss=0.021376 ema=0.304366
+[2025-12-13 00:10:26] progress step=5500/11936 loss=0.572687 ema=0.345057
+[2025-12-13 00:10:28] progress step=6000/11936 loss=0.826295 ema=0.434905
+[2025-12-13 00:10:31] progress step=6500/11936 loss=0.000083 ema=0.267655
+[2025-12-13 00:10:33] progress step=7000/11936 loss=0.022181 ema=0.331447
+[2025-12-13 00:10:36] progress step=7500/11936 loss=2.060764 ema=0.443785
+[2025-12-13 00:10:38] drift_detected step=7959 optimizer_reset=1
+[2025-12-13 00:10:38] progress step=8000/11936 loss=0.448336 ema=0.631772
+[2025-12-13 00:10:38] drift_detected step=8046 optimizer_reset=1
+[2025-12-13 00:10:39] drift_detected step=8213 optimizer_reset=1
+[2025-12-13 00:10:40] drift_detected step=8326 optimizer_reset=1
+[2025-12-13 00:10:40] drift_detected step=8425 optimizer_reset=1
+[2025-12-13 00:10:40] progress step=8500/11936 loss=0.714660 ema=0.833263
+[2025-12-13 00:10:43] progress step=9000/11936 loss=1.372323 ema=0.815612
+[2025-12-13 00:10:43] drift_detected step=9039 optimizer_reset=1
+[2025-12-13 00:10:45] progress step=9500/11936 loss=0.316720 ema=0.808609
+[2025-12-13 00:10:47] drift_detected step=9953 optimizer_reset=1
+[2025-12-13 00:10:48] progress step=10000/11936 loss=0.038238 ema=0.846665
+[2025-12-13 00:10:50] progress step=10500/11936 loss=0.034916 ema=0.385703
+[2025-12-13 00:10:53] progress step=11000/11936 loss=0.242337 ema=0.385320
+[2025-12-13 00:10:55] progress step=11500/11936 loss=0.053409 ema=0.338040
+[2025-12-13 00:10:58] run_end status=OK

@@ -1,0 +1,42 @@
+{
+  "experiment_id": "exp_0002_20251212_235529",
+  "method": "Static",
+  "mode": "static",
+  "model": "gru",
+  "seed": 3,
+  "h": 5,
+  "device": "cuda",
+  "data": {
+    "total_len": 12000,
+    "segment_len": 2000,
+    "ar_order": 5,
+    "drift_types": [
+      "mean",
+      "var",
+      "season",
+      "corr",
+      "mixed"
+    ]
+  },
+  "online": {
+    "L": 64,
+    "buffer_M": 128,
+    "batch_B": 32,
+    "steps_K": 1,
+    "lr": 0.0003,
+    "warmup": 200,
+    "window_W": 256,
+    "tau": 2.5,
+    "alpha": 0.8,
+    "beta": 0.1,
+    "eps": 0.001,
+    "loss_ema": 0.01,
+    "ph_delta": 0.005,
+    "ph_lam": 30.0,
+    "ph_alpha": 0.99,
+    "reset_warmup": 50,
+    "recovery_W": 200,
+    "log_every": 500,
+    "live_flush_every": 1
+  }
+}

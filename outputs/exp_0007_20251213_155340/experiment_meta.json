@@ -1,0 +1,56 @@
+{
+  "experiment_id": "exp_0007_20251213_155340",
+  "timestamp": "20251213_155340",
+  "command": "driftrpl_paper_final.py --device cuda --seeds 0 --hs 1 --total_len 6000 --segment_len 1000 --steps_K 8 --save_runs --live_loss --log_every 200",
+  "device": "cuda",
+  "model": "gru",
+  "seeds": [
+    0
+  ],
+  "hs": [
+    1
+  ],
+  "data": {
+    "total_len": 6000,
+    "segment_len": 1000,
+    "ar_order": 5,
+    "drift_types": [
+      "mean",
+      "var",
+      "season",
+      "corr",
+      "mixed"
+    ]
+  },
+  "online": {
+    "L": 64,
+    "buffer_M": 128,
+    "batch_B": 32,
+    "steps_K": 8,
+    "lr": 0.0003,
+    "warmup": 200,
+    "tau": 2.5,
+    "alpha": 0.8,
+    "beta": 0.1,
+    "eps": 0.001,
+    "loss_ema": 0.01,
+    "window_W": 256,
+    "ph_delta": 0.005,
+    "ph_lam": 30.0,
+    "ph_alpha": 0.99,
+    "reset_warmup": 50
+  },
+  "evaluation": {
+    "recovery_W": 200,
+    "eval_roll_win": 50
+  },
+  "methods": {
+    "Static": "static",
+    "OnlineSGD": "online_sgd",
+    "SlidingWindowSGD": "sliding_window_sgd",
+    "PHResetSGD": "ph_reset_sgd",
+    "UniformReplay": "uniform_replay",
+    "ReservoirReplay": "reservoir_replay",
+    "DriftRPL": "driftrpl"
+  }
+}
