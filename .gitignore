@@ -1,0 +1,69 @@
+# =============================
+# Python / bytecode
+# =============================
+__pycache__/
+*.py[cod]
+*$py.class
+
+# =============================
+# Virtual environments
+# =============================
+.venv/
+venv/
+env/
+ENV/
+.conda/
+
+# =============================
+# IDE / OS
+# =============================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# =============================
+# Test / cache
+# =============================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# =============================
+# Logs (generic)
+# =============================
+*.log~
+
+# =============================
+# DriftRPL experiment outputs
+# =============================
+
+# ---- Ignore heavy binary artifacts ----
+outputs/**/*.pt
+outputs/**/*.pth
+outputs/**/*.ckpt
+
+outputs/**/*.npy
+outputs/**/*.npz
+outputs/**/*.pkl
+outputs/**/*.joblib
+
+# ---- Optional future artifacts ----
+outputs/**/wandb/
+outputs/**/tensorboard/
+outputs/**/runs/*/*/*/events.out.tfevents*
+
+# =============================
+# Explicitly KEEP small, paper-relevant files
+# =============================
+!outputs/**/*.json
+!outputs/**/*.csv
+!outputs/**/*.log
+
+# =============================
+# Optional: keep directory placeholders
+# =============================
+!outputs/.gitkeep

@@ -802,7 +802,7 @@ def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--device", type=str, default="cpu", choices=["cpu", "cuda"])
-    parser.add_argument("--out_dir", type=str, default="outputs")
+    parser.add_argument("--out_dir", type=str, default="outputs_stats")
     parser.add_argument("--model", type=str, default="gru", choices=["mlp", "gru"])
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     parser.add_argument("--hs", type=int, nargs="+", default=[1, 5, 10])
