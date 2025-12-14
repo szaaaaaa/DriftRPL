@@ -807,8 +807,22 @@ def main():
     parser.add_argument("--out_dir", type=str, default="outputs_stats")
     parser.add_argument("--model", type=str, default="gru", choices=["mlp", "gru"])
     parser.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
-    parser.add_argument("--hs", type=int, nargs="+", default=[1, 5, 10])
-    
+    parser.add_argument(
+    "--hs",
+    type=int,
+    nargs="+",
+    default=[1, 5, 10],
+    help="Prediction horizons (steps ahead). Example: --hs 1 5 10"
+    )
+
+    parser.add_argument(
+    "--hidden",
+    type=int,
+    nargs="+",
+    default=[32],
+    help="Hidden sizes for the backbone model. Example: --hidden 32 64"
+    )
+
 
     # data
     parser.add_argument("--total_len", type=int, default=12000)
@@ -901,7 +915,11 @@ def main():
     exp_log = os.path.join(exp_root, "experiment.log")
     log_line(exp_log, f"experiment_id={exp_id}")
     log_line(exp_log, f"command={' '.join(sys.argv)}")
-    log_line(exp_log, f"device={args.device} model={args.model} seeds={args.seeds} hs={args.hs}")
+    log_line(
+    exp_log,
+    f"device={args.device} model={args.model} seeds={args.seeds} horizons={args.hs} hidden={args.hidden}"
+)
+
 
     cfg = OnlineConfig(
         L=args.L,
@@ -966,166 +984,143 @@ def main():
     rep_y_true: Optional[np.ndarray] = None
     rep_drift_points_sup: Optional[List[int]] = None
 
-    for h in args.hs:
-        for seed in args.seeds:
-            set_all_seeds(seed)
+    for h in args.hs:                          # horizon
+        for hidden in args.hidden:             # hidden size（新增这一层）
+            for seed in args.seeds:
+                set_all_seeds(seed)
 
-            # -----------------------------
-            #     data / stream selection
-            # -----------------------------
-            if args.dataset == "gas_drift":
-                stream = load_gas_drift_stream()
-                X = stream.X.astype(np.float32)          # (N, 128)
-                y_all = stream.y.astype(np.float32)      # (N,)
-                batch_all = stream.batch.astype(np.int32)
-                assert len(X) == len(y_all) == len(batch_all)
-                
-                # Gas Drift 没有 h、L 窗口定义，这里忽略 make_windows，直接把 X 当作 x_all
-                x_all = X
+                # -----------------------------
+                #     data / stream selection
+                # -----------------------------
+                if args.dataset == "gas_drift":
+                    stream = load_gas_drift_stream()
+                    X = stream.X.astype(np.float32)
+                    y_all = stream.y.astype(np.float32)
+                    batch_all = stream.batch.astype(np.int32)
+                    assert len(X) == len(y_all) == len(batch_all)
 
-                # 用 batch 的变化点作为 drift_points_sup（在监督序列索引上）
-                drift_points_sup = [int(i) for i in np.where(np.diff(batch_all) != 0)[0] + 1]
+                    x_all = X
+                    drift_points_sup = [int(i) for i in np.where(np.diff(batch_all) != 0)[0] + 1]
 
-                # 让后面保存/日志不炸：构造一个最小 drift_schedule（只保留关键字段）
-                drift_schedule = {
-                    "dataset": "gas_drift",
-                    "n": int(len(y_all)),
-                    "drift_points_sup": drift_points_sup,
-                    "batch_unique": int(len(np.unique(batch_all))),
-                    "gas_id_unique": int(len(np.unique(getattr(stream, "gas_id")))),
-
-                }
-            elif args.dataset == "electricity":
-                stream = load_electricity_stream(
-                    txt_path=args.electricity_path,
-                    column=args.electricity_col,
-                    segment_len=args.segment_len,
-                )
-                y = stream.y.astype(np.float32)  # raw univariate series
-
-                # electricity 走和 synthetic 一样的窗口监督化逻辑
-                x_all, y_all = make_windows(y, L=cfg.L, h=h)
-
-                # 用 batch 变化点（raw index）映射到 supervised index
-                drift_points_raw = [int(i) for i in np.where(np.diff(stream.batch) != 0)[0] + 1]
-                drift_points_sup = map_raw_drift_to_supervised_indices(
-                    drift_points_raw=drift_points_raw, L=cfg.L, h=h, total_len=len(y)
-                )
-
-                drift_schedule = {
-                    "dataset": "electricity",
-                    "path": stream.meta.get("path"),
-                    "y_col": stream.meta.get("y_col"),
-                    "n_raw": int(len(y)),
-                    "n_sup": int(len(y_all)),
-                    "drift_points_raw": drift_points_raw,
-                    "drift_points_sup": drift_points_sup,
-                    "segment_len": int(args.segment_len),
-                }
-            else:
-                 # ====== 你原来的 synthetic 代码，一字不动 ======
-                y, drift_points_raw, segments = generate_piecewise_series(
-                    total_len=args.total_len,
-                    segment_len=args.segment_len,
-                    ar_order=args.ar_order,
-                    drift_types=args.drift_types,
-                    seed=seed,
-                    )
-                x_all, y_all = make_windows(y, L=cfg.L, h=h)
-                drift_points_sup = map_raw_drift_to_supervised_indices(
-                    drift_points_raw=drift_points_raw, L=cfg.L, h=h, total_len=args.total_len
-                )
-                drift_schedule = build_drift_schedule(
-                    total_len=args.total_len,
-                    segment_len=args.segment_len,
-                    ar_order=args.ar_order,
-                    drift_types=args.drift_types,
-                    seed=seed,
-                    L=cfg.L,
-                    h=h,
-                    drift_points_raw=drift_points_raw,
-                    drift_points_sup=drift_points_sup,
-                    segments=segments,
-                )
-
-
-            # Save a paper-grade schedule once per (seed,h) at seed/h level
-            seedh_dir = os.path.join(exp_root, "runs", f"seed{seed}", f"h{h}")
-            ensure_dir(seedh_dir)
-            if args.save_runs:
-                save_json(os.path.join(seedh_dir, "drift_schedule.json"), drift_schedule)
-
-            base = build_model()
-            base_state = base.state_dict()
-
-            for display_name, mode in methods.items():
-                run_dir = os.path.join(seedh_dir, display_name)
-                ensure_dir(run_dir)
-
-                run_log = os.path.join(run_dir, "train.log")
-                log_line(run_log, f"run_start method={display_name} mode={mode} seed={seed} h={h} device={args.device}")
-                log_line(run_log, f"cfg L={cfg.L} M={cfg.buffer_M} B={cfg.batch_B} K={cfg.steps_K} lr={cfg.lr} warmup={cfg.warmup}")
-
-                live_loss_csv = None
-                if args.live_loss or args.save_runs:
-                    live_loss_csv = os.path.join(run_dir, "loss_live.csv")
-
-                model = build_model()
-                model.load_state_dict(base_state)
-
-                out = train_online(
-                    model=model,
-                    x_all=x_all,
-                    y_all=y_all,
-                    cfg=cfg,
-                    device=args.device,
-                    mode=mode,
-                    seed=seed,
-                    run_log_path=run_log,
-                    live_loss_csv_path=live_loss_csv,
-                    live_flush_every=max(1, int(args.live_flush_every)),
-                    log_every=int(args.log_every),
-                )
-
-                y_pred = out["pred"].astype(np.float64)
-                y_true = y_all.astype(np.float64)
-
-                m_mae = mae(y_true, y_pred)
-                m_rmse = rmse(y_true, y_pred)
-                m_smape = smape(y_true, y_pred)
-                rec = compute_recovery_mae(y_true, y_pred, drift_points_sup, W=args.recovery_W)
-
-                all_rows.append(
-                    {
-                        "experiment_id": exp_id,
-                        "method": display_name,
-                        "mode": mode,
-                        "model": args.model,
-                        "seed": seed,
-                        "h": h,
-                        "L": cfg.L,
-                        "MAE": m_mae,
-                        "RMSE": m_rmse,
-                        "sMAPE": m_smape,
-                        f"Recovery@{args.recovery_W}(MAE)": rec,
-                        "buffer_M": cfg.buffer_M,
-                        "steps_K": cfg.steps_K,
-                        "batch_B": cfg.batch_B,
-                        "lr": cfg.lr,
-                        "warmup": cfg.warmup,
-                        "window_W": cfg.window_W,
-                        "tau": cfg.tau,
-                        "alpha": cfg.alpha,
-                        "beta": cfg.beta,
-                        "eps": cfg.eps,
-                        "loss_ema": cfg.loss_ema,
-                        "ph_delta": cfg.ph_delta,
-                        "ph_lam": cfg.ph_lam,
-                        "ph_alpha": cfg.ph_alpha,
-                        "reset_warmup": cfg.reset_warmup,
-                        "run_dir": run_dir,
+                    drift_schedule = {
+                        "dataset": "gas_drift",
+                        "n": int(len(y_all)),
+                        "drift_points_sup": drift_points_sup,
+                        "batch_unique": int(len(np.unique(batch_all))),
+                        "gas_id_unique": int(len(np.unique(getattr(stream, "gas_id")))),
                     }
+
+                elif args.dataset == "electricity":
+                    stream = load_electricity_stream(
+                        txt_path=args.electricity_path,
+                        column=args.electricity_col,
+                        segment_len=args.segment_len,
+                    )
+                    y = stream.y.astype(np.float32)
+                    x_all, y_all = make_windows(y, L=cfg.L, h=h)
+
+                    drift_points_raw = [int(i) for i in np.where(np.diff(stream.batch) != 0)[0] + 1]
+                    drift_points_sup = map_raw_drift_to_supervised_indices(
+                        drift_points_raw=drift_points_raw, L=cfg.L, h=h, total_len=len(y)
+                    )
+
+                    drift_schedule = {
+                        "dataset": "electricity",
+                        "path": stream.meta.get("path"),
+                        "y_col": stream.meta.get("y_col"),
+                        "n_raw": int(len(y)),
+                        "n_sup": int(len(y_all)),
+                        "drift_points_raw": drift_points_raw,
+                        "drift_points_sup": drift_points_sup,
+                        "segment_len": int(args.segment_len),
+                    }
+
+                else:
+                    y, drift_points_raw, segments = generate_piecewise_series(
+                        total_len=args.total_len,
+                        segment_len=args.segment_len,
+                        ar_order=args.ar_order,
+                        drift_types=args.drift_types,
+                        seed=seed,
+                    )
+                    x_all, y_all = make_windows(y, L=cfg.L, h=h)
+                    drift_points_sup = map_raw_drift_to_supervised_indices(
+                        drift_points_raw=drift_points_raw, L=cfg.L, h=h, total_len=args.total_len
+                    )
+                    drift_schedule = build_drift_schedule(
+                        total_len=args.total_len,
+                        segment_len=args.segment_len,
+                        ar_order=args.ar_order,
+                        drift_types=args.drift_types,
+                        seed=seed,
+                        L=cfg.L,
+                        h=h,
+                        drift_points_raw=drift_points_raw,
+                        drift_points_sup=drift_points_sup,
+                        segments=segments,
+                    )
+
+                # -----------------------------
+                # directories
+                # -----------------------------
+                seedh_dir = os.path.join(
+                    exp_root, "runs", f"seed{seed}", f"h{h}", f"hidden{hidden}"
                 )
+                ensure_dir(seedh_dir)
+
+                # -----------------------------
+                # base model (shared init)
+                # -----------------------------
+                base = build_model(hidden=hidden)
+                base_state = base.state_dict()
+
+                for display_name, mode in methods.items():
+                    run_dir = os.path.join(seedh_dir, display_name)
+                    ensure_dir(run_dir)
+
+                    model = build_model(hidden=hidden)
+                    model.load_state_dict(base_state)
+
+                    out = train_online(
+                        model=model,
+                        x_all=x_all,
+                        y_all=y_all,
+                        cfg=cfg,
+                        device=args.device,
+                        mode=mode,
+                        seed=seed,
+                        run_log_path=None,
+                        live_loss_csv_path=None,
+                        live_flush_every=1,
+                        log_every=args.log_every,
+                    )
+
+                    y_pred = out["pred"].astype(np.float64)
+                    y_true = y_all.astype(np.float64)
+
+                    m_mae = mae(y_true, y_pred)
+                    m_rmse = rmse(y_true, y_pred)
+                    m_smape = smape(y_true, y_pred)
+                    rec = compute_recovery_mae(y_true, y_pred, drift_points_sup, W=args.recovery_W)
+
+                    all_rows.append(
+                        {
+                            "experiment_id": exp_id,
+                            "method": display_name,
+                            "mode": mode,
+                            "model": args.model,
+                            "seed": seed,
+                            "h": h,
+                            "hidden": hidden,
+                            "L": cfg.L,
+                            "MAE": m_mae,
+                            "RMSE": m_rmse,
+                            "sMAPE": m_smape,
+                            f"Recovery@{args.recovery_W}(MAE)": rec,
+                            "run_dir": run_dir,
+                        }
+                    )
+
 
                 # save per-run artifacts
                 if args.save_runs:

@@ -2,3 +2,4 @@
 [2025-12-14 22:17:05] command=driftrpl_all_things_here.py --dataset gas_drift --device cpu --out_dir outputs_stats --seeds 0 --hs 32 --total_len 2000
 [2025-12-14 22:17:05] device=cpu model=gru seeds=[0] hs=[1]
 [2025-12-14 22:18:27] done method=Static seed=0 h=1 MAE=157.068077 RMSE=232.497904 sMAPE=1.999051 Rec=132.535474
+[2025-12-14 22:30:51] done method=OnlineSGD seed=0 h=1 MAE=56.651033 RMSE=128.740715 sMAPE=0.424350 Rec=52.765447

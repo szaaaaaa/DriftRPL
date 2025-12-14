@@ -45,7 +45,7 @@ htmlcov/
 # =============================
 # DriftRPL experiment outputs
 # =============================
-
+outputs_stats/
 # ---- Ignore heavy binary artifacts ----
 outputs/**/*.pt
 outputs/**/*.pth
