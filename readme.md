@@ -158,6 +158,9 @@ To reproduce identical results:
 .
 ├── driftrpl_all_things_here.py
 ├── requirements.txt
+├── README.md
+├── LICENSE
+├── .gitignore
 └── outputs/
 ```
 
@@ -189,4 +192,5 @@ If you use this code in academic research, please cite the associated paper (to 
 
 ## 10. License
 
-No license is currently specified. Add a LICENSE file if you plan to share or reuse this code publicly.
+This project is released under the MIT License.  
+See the `LICENSE` file for details.
