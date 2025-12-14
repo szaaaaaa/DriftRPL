@@ -1,0 +1,5 @@
+[2025-12-14 22:18:27] run_start method=OnlineSGD mode=online_sgd seed=0 h=1 device=cpu
+[2025-12-14 22:18:27] cfg L=128 M=128 B=32 K=1 lr=0.0003 warmup=200
+[2025-12-14 22:18:27] progress step=0/13910 loss=100.825420 ema=100.825420
+[2025-12-14 22:18:55] progress step=500/13910 loss=959500.791861 ema=113668.674147
+[2025-12-14 22:19:35] progress step=1000/13910 loss=2070.282631 ema=70304.377027

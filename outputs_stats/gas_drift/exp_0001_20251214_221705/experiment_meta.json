@@ -1,0 +1,56 @@
+{
+  "experiment_id": "exp_0001_20251214_221705",
+  "timestamp": "20251214_221705",
+  "command": "driftrpl_all_things_here.py --dataset gas_drift --device cpu --out_dir outputs_stats --seeds 0 --hs 32 --total_len 2000",
+  "device": "cpu",
+  "model": "gru",
+  "seeds": [
+    0
+  ],
+  "hs": [
+    1
+  ],
+  "data": {
+    "total_len": 2000,
+    "segment_len": 2000,
+    "ar_order": 5,
+    "drift_types": [
+      "mean",
+      "var",
+      "season",
+      "corr",
+      "mixed"
+    ]
+  },
+  "online": {
+    "L": 128,
+    "buffer_M": 128,
+    "batch_B": 32,
+    "steps_K": 1,
+    "lr": 0.0003,
+    "warmup": 200,
+    "tau": 2.5,
+    "alpha": 0.8,
+    "beta": 0.1,
+    "eps": 0.001,
+    "loss_ema": 0.01,
+    "window_W": 256,
+    "ph_delta": 0.005,
+    "ph_lam": 30.0,
+    "ph_alpha": 0.99,
+    "reset_warmup": 50
+  },
+  "evaluation": {
+    "recovery_W": 200,
+    "eval_roll_win": 50
+  },
+  "methods": {
+    "Static": "static",
+    "OnlineSGD": "online_sgd",
+    "SlidingWindowSGD": "sliding_window_sgd",
+    "PHResetSGD": "ph_reset_sgd",
+    "UniformReplay": "uniform_replay",
+    "ReservoirReplay": "reservoir_replay",
+    "DriftRPL": "driftrpl"
+  }
+}
