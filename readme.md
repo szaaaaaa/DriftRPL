@@ -73,7 +73,7 @@ A smoke test is recommended to verify that:
 ```bash
 python driftrpl_all_things_here.py \
   --device cpu \
-  --out_dir outputs \
+  --out_dir outputs_stat \
   --seeds 0 \
   --total_len 2000 \
   --segment_len 200 \
@@ -156,12 +156,15 @@ To reproduce identical results:
 
 ```text
 .
-├── driftrpl_all_things_here.py
-├── requirements.txt
-├── README.md
+├── driftrpl/                   
+├── outputs_stats/                   
+├── scripts/                   
+├── driftrpl_all_things_here.py 
+├── requirements.txt           
+├── README.md                  
 ├── LICENSE
-├── .gitignore
-└── outputs/
+└── .gitignore
+
 ```
 
 ---
