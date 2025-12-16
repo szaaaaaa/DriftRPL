@@ -105,7 +105,7 @@ A full experiment typically includes:
 ```bash
 python driftrpl_all_things_here.py \
   --device cuda \
-  --out_dir outputs \
+  --out_dir outputs_stats \
   --seeds 0 1 2 3 4
 ```
 
